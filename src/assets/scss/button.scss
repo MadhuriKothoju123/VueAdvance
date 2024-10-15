@@ -1,0 +1,134 @@
+// Common SCSS for buttons
+
+.btn {
+    // General styles for the button
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px; // Default border radius
+    // border-color: currentColor;
+    border: none;
+    padding: 0.5rem 1rem; // Default padding
+    cursor: pointer;
+    text-transform: capitalize;
+    transition: background-color 0.3s, color 0.3s;
+    outline: none;
+  
+
+    &:hover {
+      opacity: 0.8;
+    }
+    &--block {
+      display: block; // Full-width button
+      width: 100%;
+    }
+  
+    &--fab {
+      border-radius: 50%; // Circular button for FAB
+      width: 56px; // Example size for FAB
+      height: 56px;
+    }
+  
+    &--flat {
+      background: transparent; // No background for flat button
+      border: none; // Remove border
+    }
+    &--primary{
+      color: #2997e1;
+    }
+    &--secondary{
+      color: #bd3dc7;
+    }
+  
+    &--icon {
+      width: 40px; // Example size for icon button
+      height: 40px;
+      padding: 0; // No padding for icon buttons
+      border-radius: 50%;
+    }
+  
+    &--large {
+      width: 50px; // Example size for icon button
+      height: 50px;
+      font-size: 1.25rem; // Large text size
+      padding: 0.75rem 1.5rem; // Adjusted padding
+    }
+  
+    &--small {
+      // width: 30px; // Example size for icon button
+      // height: 30px;
+      font-size: 0.875rem;
+      padding: 0.25rem 0.5rem;
+    }
+  
+    &--outline {
+      border: 1.2px solid currentColor;
+      background: transparent;
+    }
+  
+    &--depressed {
+      box-shadow: none; // Remove box shadow for depressed button
+    }
+  
+    &--round {
+      border-radius: 20px; // More rounded corners
+    }
+  
+    &--loading {
+      position: relative; // Position for loading icon
+      &:after {
+        content: '';
+        border: 2px solid transparent;
+        border-top-color: currentColor;
+        border-radius: 50%;
+        width: 1rem;
+        height: 1rem;
+        animation: spin 1s linear infinite;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  
+    &--disabled {
+      cursor:text; // Disable pointer events
+      opacity: 0.6; // Grey out disabled button
+      &:hover {
+        opacity: 0.6;
+      }
+    }
+  
+    &--dark {
+      background-color: #333; 
+      color: #fff; 
+    }
+  
+    // Alignment classes
+    &--top {
+      align-self: flex-start; // Align to top
+    }
+  
+    &--bottom {
+      align-self: flex-end; // Align to bottom
+    }
+  
+    &--left {
+      align-self: flex-start; // Align to left
+    }
+  
+    &--right {
+      align-self: flex-end; // Align to right
+    }
+  
+    // Spinner animation
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+  
