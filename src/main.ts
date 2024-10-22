@@ -20,6 +20,7 @@ app.use(pinia)
 app.mount('#app');
 const cartStore = useCartStore();
 const savedCart = localStorage.getItem('cart');
+app.provide(/* key */ 'message', /* value */ 'hello!')
 if (savedCart) {
   cartStore.$patch(JSON.parse(savedCart));  
 }

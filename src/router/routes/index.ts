@@ -7,6 +7,8 @@ import CounterView from "../../views/CounterView.vue";
 import ProductView from "../../views/ProductView.vue";
 import UserView from "../../views/UserView.vue";
 import CartView from "../../views/CartView.vue";
+import ReactivityView from "../../views/ReactivityView.vue";
+import WatchEffectView from "../../views/WatchEffectView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
     {
@@ -40,5 +42,9 @@ export const routes: Array<RouteRecordRaw> = [
     { path: '/user', component: UserView ,
     },
     { path: '/cart', component: CartView ,
+    },
+    { path: '/compositionApi', component: ReactivityView ,
+    },
+    { path: '/watchEffect', component: WatchEffectView ,
     }
   ];

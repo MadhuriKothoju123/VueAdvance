@@ -23,7 +23,8 @@ import { ref, watch, defineProps, defineEmits } from 'vue';
   fullScreen: false,
   fullWidth: false,
   maxWidth: 'sm', 
-  closeIcon: false
+  closeIcon: false,
+  isOpen: false,
 });
   
   const emit = defineEmits<{

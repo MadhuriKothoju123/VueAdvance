@@ -128,7 +128,7 @@ export const useAuthStore = defineStore('auth', () => {
         const result = await signInWithEmailLink(auth, email, url);
         console.log(result, "result")
         window.localStorage.removeItem('emailForSignIn');
-        user.value = result.user;
+        // user.value = result.user;
       }
     } catch (error) {
       console.error("Error completing sign-in:", error);
