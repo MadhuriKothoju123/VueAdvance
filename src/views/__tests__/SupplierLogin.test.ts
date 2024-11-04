@@ -25,10 +25,10 @@ describe('SupplierLogin.vue', () => {
     const loginSpy = vi.spyOn(supplierStore, 'loginSupplier');
 
     await wrapper.find('input#email').setValue('supplier@example.com');
-    await wrapper.find('input#password').setValue('password123');
+    await wrapper.find('input#password').setValue('Madhuri@123');
     await wrapper.find('form#loginForm').trigger('submit.prevent'); 
 
-    expect(loginSpy).toHaveBeenCalledWith('supplier@example.com', 'password123');
+    expect(loginSpy).toHaveBeenCalledWith('supplier@example.com', 'Madhuri@123');
   });
 
   it('requires email and password fields', async () => {
@@ -41,14 +41,6 @@ describe('SupplierLogin.vue', () => {
   });
   it("Supplier Login",(async ()=>{
     const wrapper = mount(SupplierLogin);
-    // const handleLoginSpy = vi.spyOn(wrapper.vm, 'handleLogin');
-
-    // await wrapper.find('input[type="text"]').setValue('test@example.com'); // Set email
-    // await wrapper.find('input[type="password"]').setValue('password123'); // Set password
-    // await wrapper.find('button').trigger('click');
-    // expect(wrapper.vm.supplier.email).toBe('test@example.com'); // Assert email
-    // expect(wrapper.vm.supplier.password).toBe('password123'); 
-    // Simulate button click
     await wrapper.find('input#email').setValue("madhuri@cognine.com");
    await wrapper.find('input#password').setValue("Hello123");
     expect(wrapper.vm.supplier.email).toBe("madhuri@cognine.com");

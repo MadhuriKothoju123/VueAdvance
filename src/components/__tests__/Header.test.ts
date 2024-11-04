@@ -1,94 +1,116 @@
 import { mount } from '@vue/test-utils';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useRouter } from 'vue-router';
-import Header from '../Header.vue';
 import { useAuthStore } from '../../piniastore/auth';
+import { useCartStore } from '../../piniastore/cart';
+import { useSupplierStore } from '../../piniastore/suppliers';
+import { useRouter } from 'vue-router';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import Header from '../Header.vue';
 
-// Mock the required stores
-vi.mock('../../piniastore/auth.ts', () => ({
-  useAuthStore: () => ({
-    user: null,
-    logout: vi.fn(),
-  }),
-}));
-
-vi.mock('../../piniastore/cart.ts', () => ({
-  useCartStore: () => ({
-    cartItemCount: 0,
-  }),
-}));
-
-vi.mock('../../piniastore/suppliers.ts', () => ({
-  useSupplierStore: () => ({
-    supplierLogout: vi.fn(),
-  }),
-}));
-
-vi.mock('vue-router', () => ({
-  useRouter: () => ({
-    push: vi.fn(),
-  }),
-}));
+vi.mock('../../piniastore/auth.ts');
+vi.mock('../../piniastore/cart');
+vi.mock('../../piniastore/suppliers');
+vi.mock('vue-router');
 
 describe('HeaderComponent', () => {
-  let wrapper:any;
-  let router;
+  let authStore: any;
+  let cartStore: any;
+  let supplierStore: any;
+  let router: any;
 
   beforeEach(() => {
-    router = useRouter();
-    wrapper = mount(Header);
+    authStore = {
+      user: null,
+      logout: vi.fn()
+    };
+    cartStore = {
+      cartItemCount: 3 
+    };
+    supplierStore = {
+      supplierLogout: vi.fn()
+    };
+    router = {
+      push: vi.fn()
+    };
+
+    (useAuthStore as any).mockReturnValue(authStore);
+    (useCartStore as any).mockReturnValue(cartStore);
+    (useSupplierStore as any).mockReturnValue(supplierStore);
+    (useRouter as any).mockReturnValue(router);
   });
 
-  it('renders the component', () => {
-    expect(wrapper.exists()).toBe(true);
-    expect(wrapper.find('.shoppycart-title').text()).toBe('Shoppy Cart');
-  });
-
-  it('navigates to login when clicking on Login menu item if user is not authenticated', async () => {
-    const loginMenuItem = wrapper.vm.menuItems.find(item => item.label === 'Login');
-    await loginMenuItem.onClick();
+  it('navigates to login on `navigateUser` call', async () => {
+    const wrapper = mount(Header);
+    await wrapper.vm.navigateUser();
     expect(router.push).toHaveBeenCalledWith('./login');
   });
 
-  it('calls logout method when clicking on Logout menu item if user is authenticated', async () => {
-    const authStore = useAuthStore();
-    authStore.user = { name: 'Test User' };
-
-    await wrapper.vm.menuItems.find(item => item.label === 'Logout').onClick();
+  it('calls logout methods and navigates to login on `logout` call', async () => {
+    authStore.user = { name: 'Test User' }; 
+    const wrapper = mount(Header);
+    await wrapper.vm.logout();
     expect(authStore.logout).toHaveBeenCalled();
-    expect(wrapper.vm.supplierStore.supplierLogout).toHaveBeenCalled();
+    expect(supplierStore.supplierLogout).toHaveBeenCalled();
     expect(router.push).toHaveBeenCalledWith('./login');
   });
 
-  it('navigates to supplier registration if user is authenticated', async () => {
-    const authStore = useAuthStore();
-    authStore.user = { name: 'Test User' };
-
-    await wrapper.vm.supplierRegistration();
-    expect(router.push).toHaveBeenCalledWith('./supplier/registration');
+  it('renders "Login" menu item when user is not authenticated', () => {
+    authStore.user = null; // Ensure no user is logged in
+    const wrapper = mount(Header);
+    const menuItems = wrapper.vm.menuItems;
+    expect(menuItems).toContainEqual(
+      expect.objectContaining({ label: 'Login', value: 'login' })
+    );
   });
 
-  it('navigates to login when clicking on Become a Supplier if user is not authenticated', async () => {
-    await wrapper.vm.supplierRegistration();
-    expect(router.push).toHaveBeenCalledWith('./login');
+  it('renders "Logout" menu item when user is authenticated', () => {
+    authStore.user = { name: 'Test User' }; 
+    const wrapper = mount(Header);
+    const menuItems = wrapper.vm.menuItems;
+    expect(menuItems).toContainEqual(
+      expect.objectContaining({ label: 'Logout', value: 'logout' })
+    );
   });
 
-  it('navigates to cart if user is authenticated', async () => {
-    const authStore = useAuthStore();
-    authStore.user = { name: 'Test User' };
+  it('calls the `onClick` function of the selected menu item in `handleSelect`', () => {
+    const mockOnClick = vi.fn();
+    const wrapper = mount(Header);
+    const item = { onClick: mockOnClick };
+    wrapper.vm.handleSelect(item);
+    expect(mockOnClick).toHaveBeenCalled();
+  });
 
-    await wrapper.vm.navigateToCart();
+  it('navigates to cart page if user is authenticated when calling `navigateToCart`', () => {
+    authStore.user = { name: 'Test User' }; 
+    const wrapper = mount(Header);
+    wrapper.vm.navigateToCart();
     expect(router.push).toHaveBeenCalledWith('./cart');
   });
 
-  it('navigates to login when clicking on cart if user is not authenticated', async () => {
-    await wrapper.vm.navigateToCart();
+  it('navigates to login page if user is not authenticated when calling `navigateToCart`', () => {
+    authStore.user = null;
+    const wrapper = mount(Header);
+    wrapper.vm.navigateToCart();
     expect(router.push).toHaveBeenCalledWith('./login');
   });
 
-  it('calls handleSelect method when a menu item is selected', async () => {
-    const handleSelectSpy = vi.spyOn(wrapper.vm, 'handleSelect');
-    await wrapper.vm.handleSelect({ label: 'Profile' });
-    expect(handleSelectSpy).toHaveBeenCalledWith({ label: 'Profile' });
+  it('navigates to supplier registration if user is authenticated on `supplierRegistration`', () => {
+    authStore.user = { name: 'Test User' }; 
+    const wrapper = mount(Header);
+    wrapper.vm.supplierRegistration();
+    expect(router.push).toHaveBeenCalledWith('./supplier/registration');
+  });
+
+  it('navigates to login page if user is not authenticated on `supplierRegistration`', () => {
+    authStore.user = null; 
+    const wrapper = mount(Header);
+    wrapper.vm.supplierRegistration();
+    expect(router.push).toHaveBeenCalledWith('./login');
+  });
+
+  it('displays the cart item count if there are items in the cart', () => {
+    const wrapper = mount(Header);
+    const cartBadge = wrapper.find('.cart-badge');
+    expect(cartBadge.exists()).toBe(true);
+    expect(cartBadge.text()).toBe(String(cartStore.cartItemCount));
   });
 });
