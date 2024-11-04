@@ -1,8 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { GoogleAuthProvider, connectAuthEmulator, getAuth, RecaptchaVerifier, getRedirectResult, signInWithRedirect } from "firebase/auth";
-import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import { GoogleAuthProvider, getAuth, getRedirectResult, signInWithRedirect } from "firebase/auth";
+import {  getFirestore } from "firebase/firestore";
 import { getStorage } from 'firebase/storage';
-import { getMessaging } from 'firebase/messaging';
 // import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 const firebaseConfig = {
     apiKey: "AIzaSyCC496FQotdTGSgwnHGVjMeJ4L8xs3WJA8",
@@ -17,14 +16,13 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-// const storage = getStorage(app);
+
+const storage = getStorage(app);
  
 const provider = new GoogleAuthProvider();
 
 const db = getFirestore(app);
 
-const messaging = getMessaging(app);
-// const functions = getFunctions(app);
 
 
 // if (window.location.hostname === 'localhost') {
@@ -56,8 +54,8 @@ const getGoogleRedirectResult = async () => {
 };
 
 
-auth.languageCode = 'en';  // You can also use `auth.useDeviceLanguage();`
-auth.settings.appVerificationDisabledForTesting = true; // Only for testing
+// auth.languageCode = 'en';  // You can also use `auth.useDeviceLanguage();`
+// auth.settings.appVerificationDisabledForTesting = true; // Only for testing
 
 
-export { auth, db, signInWithGoogle, getGoogleRedirectResult, messaging, provider, RecaptchaVerifier }
+export { auth, db, storage, signInWithGoogle, getGoogleRedirectResult, provider }

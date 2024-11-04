@@ -8,7 +8,6 @@
       <p>Is Even? {{ isEven ? 'Yes' : 'No' }}</p>
   
       <button @click="increment">Increment</button>
-      <!-- <button @click="resetCount">Reset  Count</button> -->
       <button @click="resetCount">Reset store</button>
 
       <button @click="replaceState">replace store</button>

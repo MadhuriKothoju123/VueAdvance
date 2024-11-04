@@ -1,12 +1,9 @@
 <template>
     <div class="container">
-        <!-- <div class="sidenav"></div> -->
         <div class="body">
        <div class=" header">
-        <!-- <div style="display: flex; justify-content: end;"> -->
         <button>Login</button>
         <button>User profile</button>
-       <!-- </div> -->
        </div>
        <router-view class="main-content"></router-view>
     </div>

@@ -1,35 +1,33 @@
 <template>
   <div class="container">
-
     <CgDialog
       :isOpen="isOpen"
       @close="isOpen = false"
       :fullWidth="true"
       :maxWidth="'sm'"
       :closeIcon="true"
-
     >
-    <template #title>
-      <div style="display: flex;  justify-content: center; width: 100%">
-      <h3> Sign Up with Email</h3>
-    </div>
+      <template #title>
+        <div style="display: flex; justify-content: center; width: 100%">
+          <h3>Sign Up with Email</h3>
+        </div>
       </template>
 
       <form @submit.prevent="signUpWithEmail">
-          <div class="input-group">
-            <input
-              v-model="email"
-              class="text-input"
-              type="text"
-              id="username"
-              placeholder="Enter email"
-              required
-            />
-          </div>
-<div style="display: flex; justify-content: end;">
-          <CgButton @click="signUpWithEmail"  color="#308ecd">Verify</CgButton>
+        <div class="input-group">
+          <input
+            v-model="email"
+            class="text-input"
+            type="text"
+            id="username"
+            placeholder="Enter email"
+            required
+          />
         </div>
-        </form>
+        <div style="display: flex; justify-content: end">
+          <CgButton @click="signUpWithEmail" color="#308ecd">Verify</CgButton>
+        </div>
+      </form>
     </CgDialog>
 
     <CgCard
@@ -40,99 +38,114 @@
       :minHeight="200"
     >
       <!-- Title Slot -->
-      <template #title>
-        Sign Up
-      </template>
+      <template #title> Sign Up </template>
 
       <!-- Subtitle Slot -->
       <template #subtitle>
         Access your account for a seamless shopping experience.
       </template>
 
-
       <button class="google-btn" @click="googleSignIn()">
-          <img
-            src="../assets/images/icons8-google.svg"
-            alt="Google logo"
-            class="google-icon"
-          />
-          Sign in with Google
-        </button>
+        <img
+          src="../assets/images/icons8-google.svg"
+          alt="Google logo"
+          class="google-icon"
+        />
+        Sign in with Google
+      </button>
 
-        <button class="google-btn" @click="isOpen = true">
-          <img
-            src="../assets/images/icons8-email-24.png"
-            alt="email logo"
-            class="google-icon"
-          />
-          Sign in with Email
-        </button>
+      <button class="google-btn" @click="isOpen = true">
+        <img
+          src="../assets/images/icons8-email-24.png"
+          alt="email logo"
+          class="google-icon"
+        />
+        Sign in with Email
+      </button>
     </CgCard>
   </div>
+  <!-- <CgAlert
+    :message="alertMessage"
+    :type="alertType"
+    @close="alertVisible = false"
+  /> -->
 </template>
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
-import { auth, provider } from '../firebase';
-import { useAuthStore } from '../piniastore/auth';
-import { useRouter } from 'vue-router';
-import { signInWithPopup } from 'firebase/auth';
-import { CgCard } from '../common_ui_components';
-import { CgDialog } from '../common_ui_components';
-import { CgButton } from '../common_ui_components';
+import { ref } from "vue";
+import { auth, provider } from "../firebase";
+import { useAuthStore } from "../piniastore/auth";
+import { useRouter } from "vue-router";
+import { signInWithPopup } from "firebase/auth";
+import { CgCard } from "../common_ui_components";
+import { CgDialog } from "../common_ui_components";
+import { CgButton } from "../common_ui_components";
+import { CgAlert } from "../common_ui_components";
+
+import { useCartStore } from "../piniastore/cart";
 
 const authStore = useAuthStore();
-const router= useRouter();
+const router = useRouter();
 const isOpen = ref(false);
-const email= ref('');
-const googleSignIn = async() => {
- await signInWithGoogle();
-}
+const email = ref("");
+const cartStore = useCartStore();
+const alertVisible = ref(false);
+const alertMessage = ref("");
+const alertType = ref("info");
 
+const googleSignIn = async () => {
+  await signInWithGoogle();
+};
 
 const signInWithGoogle = async () => {
-      try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        authStore.login(user)
-        console.log('Signed in user:', user);
-        router.push('/dashboard');
-      } catch (error) {
-        console.error('Error signing in with Google:', error);
-        router.push('/login');
-      }
-    };
+  const result = await signInWithPopup(auth, provider);
+  const user = result.user;
+  const res = await authStore.login(user);
+  if (res.success) {
+// import { BaseAlert } from "@madhurikothoju123/cg_ui_project";
+    console.log(res, "res")
+    cartStore.setUserId(user?.uid);
+    router.push("/dashboard");
 
-    const signUpWithEmail=async()=>{
-      console.log(email.value, "email")
-      try{
-        await authStore.sendSignInLink(email.value)
+    alert(res.message);
+  } else {
 
-      }
-      catch (error){
+    alertMessage.value = res?.message;
+    showAlert(res.message, "error");
+    router.push("/login");
+  }
+};
+const showAlert = (message: string, type: string) => {
+  alertMessage.value = message;
+  alertType.value = type;
+  alertVisible.value = true;
+};
 
-        console.log(error)
-      }
-    }
-    const getNameFromEmail=(email: string)=> {
-  const namePart = email.split('@')[0];
+const signUpWithEmail = async () => {
+  try {
+    await authStore.sendSignInLink(email.value);
+  } catch (error) {
+    console.log(error);
+  }
+};
+//     const getNameFromEmail=(email: string)=> {
+//   const namePart = email.split('@')[0];
 
-  const formattedName = namePart.replace(/[._-]/g, ' ');
+//   const formattedName = namePart.replace(/[._-]/g, ' ');
 
-  const name = formattedName
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+//   const name = formattedName
+//     .split(' ')
+//     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+//     .join(' ');
 
-  return name;
-}
+//   return name;
+// }
 </script>
 
 <style scoped>
-/* Style for the container to center content */
 .container {
   display: flex;
-  justify-content: center; /* Centers horizontally */
-  align-items: center; /* Centers vertically */
+  justify-content: center;
+  align-items: center;
   height: 100vh;
   width: 100%;
   background-size: 100% 100%;

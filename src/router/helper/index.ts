@@ -1,36 +1,32 @@
-// import firebase from 'firebase/app';
-// import 'firebase/auth';
-// import { NavigationGuardNext } from 'vue-router';
+import { useAuthStore } from "../../piniastore/auth";
+import { auth } from "../../firebase";
+import { NavigationGuardNext, RouteLocationNormalized } from "vue-router";
+import { useSupplierStore } from "../../piniastore/suppliers";
+const isEmptyObject = (obj) => {
+  return Object.keys(obj).length === 0;
+};
 
-// export const onBeforeRoute = ( next: NavigationGuardNext) => {
-// //   const currentUser = firebase.auth().currentUser;
-// //   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-// //   const guestUser = to.matched.some((record) => record.meta.guestUser);
-// //   const agencyVerification = localStorage.getItem('agency_verification');
+export const onBeforeRoute = (
+  to: RouteLocationNormalized,
+  next: NavigationGuardNext
+) => {
+  const currentUser = auth.currentUser;
+  const AuthStore = useAuthStore();
+  const supplierStore = useSupplierStore();
+  console.log(to.name, !supplierStore?.suppliers);
 
-// //   if (requiresAuth && !currentUser) {
-// //     next('/guest');
-// //   } else if (requiresAuth && currentUser && !currentUser.emailVerified) {
-// //     next('/verify');
-// //   } else if (requiresAuth && currentUser && agencyVerification === 'pending') {
-// //     next('/agent-verify');
-// //   } else if (requiresAuth && currentUser) {
-// //     next();
-// //   } else if (
-// //     !requiresAuth &&
-// //     currentUser &&
-// //     currentUser.emailVerified &&
-// //     !guestUser
-// //   ) {
-// //     next('/dashboard'); // only when the user is there and he opened register
-// //   } else {
-// //     next();
-// //   }
-// next();
-// };
+  if (to.meta.requiresAuth && !AuthStore?.user) {
+    next("./login");
+  } else if (to.name === "AddProduct" && isEmptyObject(supplierStore.suppliers)) {
+    console.log(to.name, !supplierStore?.suppliers);
+    next("/supplier/supplierLogin");
+  } else {
+    next();
+  }
+};
 
-// export const onRouteError = (error: { message: string; }) => {
-//   if (/loading chunk \d* failed./i.test(error.message) && navigator.onLine) {
-//     window.location.reload();
-//   }
-// };
+export const onRouteError = (error: { message: string }) => {
+  if (/loading chunk \d* failed./i.test(error.message) && navigator.onLine) {
+    window.location.reload();
+  }
+};

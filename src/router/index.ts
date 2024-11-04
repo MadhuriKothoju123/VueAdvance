@@ -1,7 +1,7 @@
 import Vue from 'vue';
-import {  createRouter, createWebHistory } from 'vue-router';
+import {  createRouter, createWebHistory, NavigationGuardNext, NavigationGuardNextCallback, RouteLocationNormalized } from 'vue-router';
 import { routes } from './routes';
-// import { onBeforeRoute, onRouteError } from './helper';
+import { onBeforeRoute, onRouteError } from './helper';
 
 // import { onBeforeRoute, onRouteError } from './helpers';
 
@@ -12,7 +12,7 @@ const router = createRouter({
     routes, // Array of routes typed as RouteRecordRaw
   });
 
-// router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => onBeforeRoute(next));
+router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => onBeforeRoute(to,next));
 
 // router.onError((error: { message: string; }) => onRouteError(error));
 

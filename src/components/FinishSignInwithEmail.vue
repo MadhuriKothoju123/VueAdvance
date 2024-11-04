@@ -1,6 +1,3 @@
-<!-- src/components/FinishSignIn.vue -->
-
-  
 <script setup>
 import { useAuthStore } from '../piniastore/auth';
 import { onMounted } from 'vue';

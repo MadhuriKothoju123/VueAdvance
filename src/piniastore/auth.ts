@@ -3,57 +3,21 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { auth, db} from '../firebase';
 import { 
-  createUserWithEmailAndPassword, 
   isSignInWithEmailLink, 
-  sendEmailVerification, 
   sendSignInLinkToEmail, 
-  signInWithEmailAndPassword, 
   signInWithEmailLink, 
   signOut, 
   User, 
-  UserCredential 
 } from 'firebase/auth';
-import { addDoc, collection, doc, DocumentData, getDocs, query, setDoc, Timestamp, where } from 'firebase/firestore';
+import {  collection, doc, DocumentData, getDocs, query, setDoc, Timestamp, where } from 'firebase/firestore';
+import { UserData } from '../types/userData';
 
-// Define the type for the user data used in signup and login
-interface UserData {
-uid:  string;
-  email: string;
-  name?: string;
-  role?: string;
-  createdAt?: string
-}
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<UserData | null>(null);
 
-  // const signup = async (userData: UserData): Promise<boolean> => {
-  //   try {
-  //     const userCredential: UserCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
-  //     const user:User = userCredential.user;
-  //     console.log(user);
-  //     console.log(auth.currentUser?.uid);
 
-  //     await sendEmailVerification(user);
-
-  //     // Store user data in Firestore
-  //     await setDoc(doc(db, 'usersDetails', user.uid), {
-  //       name: userData.username,
-  //       email: userData.email,
-  //       phoneNumber: userData.mobileNumber,
-  //       country: userData.country,
-  //       userId: user.uid,
-  //       fcmToken: '',
-  //     });
-
-  //     return true;
-  //   } catch (error) {
-  //     console.error("Signup error:", error);
-  //     throw error;
-  //   } 
-  // };
-
-  const login = async (userDetails: User): Promise<boolean> => {
+  const login = async (userDetails: User): Promise<object> => {
     console.log("Login")
     try {
       if (userDetails.email) {
@@ -76,19 +40,25 @@ export const useAuthStore = defineStore('auth', () => {
         } else {
         
           const userRef = doc(db, 'users', userDetails.uid);
-          await setDoc(userRef, {
-            uid: userDetails.uid,
-            name: userDetails.displayName,
+          
+          const userData = {
+            uid:userDetails.uid,
             email: userDetails.email,
+            name: userDetails.displayName,
             role: 'customer',
-            createdAt: Timestamp.now()
-          });
+            createdAt: Timestamp.now(),
+          }
+
+          await setDoc(userRef,{...userData}
+           
+          );
         }
+
     }
-    return true;
+    return { success: true, message: "User successfully logined" };
    } catch (error: any) {
       console.error("Login error:", error.message);
-      throw error;
+      return { success: false, message: error.message };
     }
   };
 
@@ -96,6 +66,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await signOut(auth);
       user.value = null;
+      
       return true;
     } catch (error: any) {
       console.error("Logout error:", error.message);

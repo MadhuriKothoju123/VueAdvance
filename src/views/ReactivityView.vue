@@ -22,7 +22,6 @@
         
         userRef.value = { ...userRef.value, name: 'Bob' };
       };
-    //   const username: string= reactive("madhuri"})
   
       const userReactive = reactive({ name: 'Alice', age: 25 });
   
